@@ -1,7 +1,16 @@
+ 
 #include <stdio.h>
-int main() {
-   // printf() displays the string inside quotation
-   printf("Hello, World!");
-   return 0;
+int main() {   
+    int number;
+   
+    printf("Sayıyı Gir : ");   
+    
+    // reads and stores input
+    scanf("%d", &number);
+ 
+    // displays output
+    printf("Girdiğiniz Sayı : %d", number);
+    
+    return 0;
 }
  

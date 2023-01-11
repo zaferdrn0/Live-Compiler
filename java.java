@@ -1,20 +1,22 @@
+
+import java.util.Scanner;
  
-#include<stdio.h>
-int main() {
-      double ilkSayi, ikinciSayi, temp;
-      printf("Sayı 1: ");
-      scanf("%lf", &ilkSayi);
-      printf("Sayı 2: ");
-      scanf("%lf", &ikinciSayi);
  
-      temp = ilkSayi;
+public class JavaOrnekleri {
  
-      ilkSayi = ikinciSayi;
+  
+    public static void main(String[] args) {
+       
+        Scanner reader = new Scanner(System.in);
+       
+        System.out.print("Birinci Sayıyı Girin: ");         
+        int sayi1 = reader.nextInt();
+        System.out.print("İkinci Sayıyı Girin: ");   
+        int sayi2 = reader.nextInt();
  
-      ikinciSayi = temp;
+        int toplam = sayi1 + sayi2;
  
-      printf("\nDeğişiklikten sonra ilkSayi = %.2lf\n", ilkSayi);
-      printf("Değişiklikten sonra ikinciSayi = %.2lf", ikinciSayi);
-      return 0;
+        System.out.println("Sayıların Toplamı: " + toplam);
+    }
+    
 }
- 

@@ -1,81 +1,147 @@
 <!DOCTYPE html>
 <html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Compiler</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.3/socket.io.js"
+      integrity="sha512-iWPnCISAd/J+ZacwV2mbNLCaPGRrRo5OS81lKTVPtRg1wGTC20Cfmp5Us5RcbLv42QLdbAWl0MI57yox5VecQg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Development</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.2/css/bootstrap.min.css"
+      integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.3/socket.io.js"
-    integrity="sha512-iWPnCISAd/J+ZacwV2mbNLCaPGRrRo5OS81lKTVPtRg1wGTC20Cfmp5Us5RcbLv42QLdbAWl0MI57yox5VecQg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.2/css/bootstrap.min.css"
-    integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-    integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="/style.css" />
-</head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-<body>
-  <div class="container-fluid mt-3" id="container">
-    <div class="navbar d-flex justify-content-between">
-      <div class="d-flex justify-content-around" style="width: 20%;">
-        <i style="font-size: 30px;" class="fas fa-home"></i>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/renk.css" />
+  </head>
 
-        <p style="display: none;" id="oda-id"></p>
-        <button id="kopyala-btn" onclick="kopyala()" class="btn btn-primary">
-          Id Kopyala
-        </button>
+  <body>
+    <div class="container-fluid mt-3" id="container">
+      <div class="navbar d-flex justify-content-between">
+        <div class="d-flex justify-content-around" style="width: 20%">
+          <i style="font-size: 30px" class="fas fa-home"></i>
 
-        <div>
-          <select class="form-select" name="language" id="language" onchange="myFunction()">
-            <option disabled selected value>Bir Dil Seçiniz</option>
-            <option value="Python">Python</option>
-            <option value="Php">Php</option>
-            <option value="Java">Java</option>
-            <option value="C">C</option>
-            <option value="C++">C++</option>
-            <option value="Node">NodeJs</option>
-            <option id="Html-Select" value="Html">HTML/CSS/JS</option>
-          </select>
+          <p style="display: none" id="oda-id"></p>
+          <button id="kopyala-btn" onclick="kopyala()" class="btn btn-primary">
+            Id Kopyala
+          </button>
+          <button id="kayit-et" onclick="kodKayitEt()">Kod Kaydet</button>
+          
+
+          <div>
+            <select
+              class="form-select"
+              name="language"
+              id="language"
+              onchange="myFunction()"
+            >
+              <option disabled selected value>Bir Dil Seçiniz</option>
+              <option value="Python">Python</option>
+              <option value="Php">Php</option>
+              <option value="Java">Java</option>
+              <option value="Cdil">C(Beta)</option>
+              <option value="Cpp">C++</option>
+              <option id="Html-Select" value="Html">HTML/CSS/JS</option>
+            </select>
+          </div>
+          
+          <button
+            id="btn"
+            type="button"
+            class="btn btn-dark"
+            onclick="InputAcma()"
+          >
+            <i class="fas fa-play"></i>
+          </button>
+          
         </div>
-        <button id="btn" type="button" class="btn btn-dark"> <i class="fas fa-play"></i> </button>
-      </div>
-      <div class="d-flex justify-content-between" style="width: 20%;">
-        <textarea id="Input-al" type="text" style="width: 50%; height: 4vh; resize: none; border-radius: .5rem;"
-          onkeypress="degerAlma(event, this)" placeholder="İnput Değerlerini Giriniz"></textarea>
+        <div class="d-flex justify-content-around">
+          <h4 id="KullaniciBilgi" style="color: white;"></h4>
+        </div>
 
-        <button class="btn btn-dark btn-xs">Input Al <i class="fa fa-pencil"></i> </button>
+
+        <div class="d-flex justify-content-between" style="width: 20%">
+          <button id="kodGetir" onclick="kodGetirr()">Kod Getir</button>
+          <input id="Input-al" type="text" onkeypress="degerAlma(event, this)" /> 
+          
+          <button id="Input-al-btn" class="btn btn-dark btn-xs">
+            Input <i class="fa fa-pencil"></i>
+          </button>
+          
+        </div>
+      </div>
+     
+      <div class="row mt-3">
+        <div id="editor" class="col-6">
+          <p>
+            <textarea
+              style="
+                width: 1.5%;
+                height: 88vh;
+                padding-top: 9px;
+                background-color: rgb(0, 0, 0);
+                color: white;
+                text-align: center;
+              "
+              id="lineCounter"
+              wrap="off"
+              readonly
+            >
+1.</textarea
+            ></p>
+            <div style="margin-top: -25px; margin-left: 2%; position: relative;">
+              <textarea
+              placeholder="Bir Programlama Dili Seciniz" id="editing" spellcheck="false" oninput="update(this.value); sync_scroll(this);" onscroll="sync_scroll(this);" onkeydown="check_tab(this, event);"
+              disabled  style="width: 98%; height: 88vh;"
+                
+              ></textarea>
+              <pre style="width: 98%; height: 88vh" id="highlighting" aria-hidden="true">
+                <code class="language-html" id="highlighting-content">
+        
+                </code>
+                </pre>
+                
+              </div>
+        </div>
+
+        <div style="height: 89.8vh;" class="col-6">
+          <textarea style="width: 100%; height: 88vh; color: black;" id="cikti" disabled></textarea>
+          <iframe
+            style="background-color: white; display: none"
+            height="98%;"
+            width="100%"
+            id="iframe-Cikti"
+            src=""
+            frameborder="0"
+          ></iframe>
+        </div>
       </div>
     </div>
 
-    <div class="row mt-3">
-      <div id="editor" class="col-6">
-        <p>
-          <textarea
-            style="width: 1.5%; height: 88vh; padding-top: 9px;background-color: rgb(0, 0, 0); color: white;text-align: center; "
-            id="lineCounter" wrap="off" readonly>1.</textarea>
-          <textarea wrap="off" spellcheck="false" style="width: 100%; height: 88vh" id="ahmet"></textarea>
-        </p>
-      </div>
-
-      <div class="col-6">
-
-
-        <textarea style="width: 100%; height: 88vh" id="cikti"></textarea>
-        <iframe style="background-color: white; display: none" height=950px; width="100%" id="iframe-Cikti" src=""
-          frameborder="0"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-    integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="/script.js"></script>
-</body>
-
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+      integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/script.js"></script>
+    <script src="/prism.js"></script>
+  </body>
 </html>

@@ -1,1 +1,1 @@
-print("hello world")
+zafer drn

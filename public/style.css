@@ -7,15 +7,16 @@ body{
 
 #container{
  
- margin-right: 20%;
+ 
   
   
 }
-#ahmet{
+#editing{
 font-family: lucida console, courier new, courier, monospace;
 margin: 0;
 padding: 10px 0;
-height: 75vh;
+width: 100%; 
+height: 88vh;
 border-radius: 0;
 resize: none;
 font-size: 16px;
@@ -25,21 +26,9 @@ outline: none;
 -webkit-box-sizing: border-box;
 box-sizing: border-box;
 }
-#codeEditor {
-font-family: lucida console, courier new, courier, monospace;
-padding: 10px 0;
-height: 75vh;
-border-radius: 0;
-resize: none;
-font-size: 16px;
-line-height: 1.2;
-outline: none;
--moz-box-sizing: border-box;
--webkit-box-sizing: border-box;
-box-sizing: border-box;
-}
+
 #lineCounter:focus-visible,
-#ahmet:focus-visible {
+#editing:focus-visible {
   outline:none;
 }
 #lineCounter {
@@ -58,8 +47,8 @@ border-color:#3E3D32;
 color:#928869;
 }
 
-#ahmet {
-padding-left: calc(2.2rem + 5px);
+#editing {
+
 width:100%;
 /* Determine appearance of code editor */
 background-color:rgb(21,32,43);
@@ -73,8 +62,12 @@ color: green;
 }
 
 #Input-al{
-  width: 100%;
-  height: 10vh;
+  display: none;
+  width: 50%; 
+  height: 4vh; 
+  resize: none; 
+  border-radius: .5rem; 
+
 }
 
 ::-webkit-scrollbar {
@@ -101,3 +94,17 @@ font-size: 14px;
 text-align: center;
 line-height: 30px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

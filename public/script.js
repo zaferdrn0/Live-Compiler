@@ -18,9 +18,17 @@ let result_elementt = document.querySelector("#highlighting");
 let kayitEt = document.getElementById("kayit-et");
 let kodGetir = document.getElementById("kodGetir");
 let kullaniciBilgi = document.getElementById("KullaniciBilgi");
+let inpBaslikGir = document.getElementById("inp-baslik");
+let kodGoster = document.getElementById("kodGoster");
+let kodGosterDiv = document.getElementById("kodGosterDiv");
+let kodSil = document.getElementById("kodSil");
+let kullaniciAdiBas = document.getElementById("kullanici-adi")
+let cikisYap = document.getElementById("cikisYap");
 
 var joinArray = [];
 var idYazdir = [];
+
+
 
 if(area.value === ""){
   kayitEt.disabled= true;
@@ -44,6 +52,7 @@ area.addEventListener("input", () => {
 socket.on("kod", (data) => {
   area.value = data;
   
+  console.log(area.value);
   update(data)
   
 });
@@ -258,7 +267,7 @@ odaId.innerText = idYazdir[4];
 function kopyala(element) {
   let kopyalaIdValue = odaId.innerText;
 
-  navigator.clipboard.writeText(kopyalaIdValue).then(() => {
+  window.navigator.clipboard.writeText(kopyalaIdValue).then(() => {
     // Alert the user that the action took place.
     // Nobody likes hidden stuff being done under the hood!
     alert("Oda ID' si kopyalandı");
@@ -319,6 +328,7 @@ area.addEventListener('keydown', event => {
 
 InputAcBtn.addEventListener("click", () => {
   Input.style.display = "block";
+  InputAcBtn.style.display = "none";
 });
 
 
@@ -379,9 +389,12 @@ headers: {
   return response.json();
 })
 .then(function (data) {
-  if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
-  if(data.cikis != undefined) window.location.replace(data.cikis);
-  console.log(data);
+   //if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
+   //(data.cikis != undefined) window.location.replace(data.cikis);
+ 
+  let ad = JSON.stringify(data, ["kullaniciAdi"])
+ ad = ad.split("\"");
+    kullaniciAdiBas.innerHTML = ad[3];
   //alert(JSON.stringify(data,['message'].['username']));
 })
 .catch(function (err) {
@@ -393,6 +406,12 @@ return false;
 
 
 function kodKayitEt(){
+  if(inpBaslikGir.value ==="") {
+    alert("Baslik giriniz");
+  }
+  else{
+    
+  
   fetch("/kodKayit", {
     method: "POST",
     headers: {
@@ -400,6 +419,7 @@ function kodKayitEt(){
     },
     
     body: JSON.stringify({
+        baslik:inpBaslikGir.value, //
         kod: area.value,
         dil: language.value,})
   })
@@ -409,7 +429,9 @@ function kodKayitEt(){
     .then(function (data) {
       //if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
       console.log(data);
+      
       alert(JSON.stringify(data, ['message']));
+      inpBaslikGir.value = "";
       
     })
     .catch(function (err) {
@@ -417,9 +439,16 @@ function kodKayitEt(){
     });
 
   return false;
+    
+}
+  
 }
 
+
+
 function kodGetirr(){
+  kodGosterDiv.style.display="block";
+  kodGoster.innerHTML = '';
   fetch("/kodGetir", {
     method: "POST",
     headers: {
@@ -434,7 +463,19 @@ function kodGetirr(){
     })
     .then(function (data) {
       //if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
-      console.log(data);
+        let opt = document.createElement('option');
+       opt.innerHTML = "Lütfen kodunuzu seciniz";
+       opt.style.disabled = true;
+        kodGoster.appendChild(opt);
+       for(var i=0; i<data.length; i++) {
+        
+        console.log(JSON.parse(data[i]).baslik);
+        var option = document.createElement("option",data[i].baslik);
+        option.innerText = JSON.parse( data[i]).baslik;
+        kodGoster.appendChild(option);
+       }
+
+      
     // let kodgoruntule =
      //alert(kodgoruntule);
     })
@@ -444,4 +485,78 @@ function kodGetirr(){
 
   return false;
 
+}
+
+function koduBas(){
+  fetch("/kodEkranaBas", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    
+    body: JSON.stringify({
+      baslik: kodGoster.value,
+      
+       })
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      //if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
+      area.value = data;
+      update(area.value);
+    })
+    .catch(function (err) {
+      console.log("Fetch Error :-S", err);
+    });
+
+  return false;
+
+}
+
+function kodSilmeF(){
+  console.log("silme calıstı")
+  fetch("/kodSilme", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    
+    body: JSON.stringify({
+        baslik: kodGoster.value,
+       })
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      //if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
+      alert(JSON.stringify(data, ["message"]));
+    })
+    .catch(function (err) {
+      console.log("Fetch Error :-S", err);
+    });
+
+  return false;
+}
+
+function cikisYapp(){
+  fetch("/cikisYapp", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    }, 
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      if(data.yonlendir != undefined) window.location.replace(data.yonlendir);
+    })
+    .catch(function (err) {
+      console.log("Fetch Error :-S", err);
+    });
+
+  return false;
 }

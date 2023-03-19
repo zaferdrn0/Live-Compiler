@@ -21,6 +21,30 @@ let rooms = [];
 
 let dilGlobal = "";
 
+let derleyiciKomut_Windows = {
+  os_isim: "windows",
+  terminal: "cmd",
+  terminal_param: "/c",
+  python: "py",
+  c: "gcc C.c -o c.exe",
+  cpp: "g++ Cpp.cpp -o a.exe",
+  php: "php",
+  java: "java"
+}
+
+let derleyiciKomut_Linux = {
+  os_isim: "linux",
+  terminal: "/bin/bash",
+  terminal_param: "-c",
+  python: "python3",
+  c: "gcc C.c -o c.exe",
+  cpp: "g++ Cpp.cpp -o a.exe",
+  php: "php",
+  java: "java"
+}
+
+let seciliKomutOS = derleyiciKomut_Windows;
+
 
 app.get("/odaOlustur", (req, res) => {
   roomname = uuidv4();
@@ -36,7 +60,7 @@ app.get("/room/*", (req, res) => {
 io.on("connection", (socket) => {
   socket.on("kodlar", (data) => {
     let code = JSON.parse(data);
-    io.sockets.in(code.oda).emit("kod", code.code);
+    socket.to(code.oda).emit("kod", code.code); // to
     
   });
   socket.on("language-change", (data) => {
@@ -91,8 +115,7 @@ io.on("connection", (socket) => {
       fs.writeFile(dosyaAd, data, (err) => {
         if (err) console.log(err);
         else console.log("dosya olusturuldu");
-
-        var cp = spawn(process.env.comspec, ["/c", komut, dosyaAd]);
+        var cp = spawn(seciliKomutOS.terminal, [seciliKomutOS.terminal_param, komut +" " + dosyaAd]);
         cp.stdout.on("data", function (data) {
           console.log(data);
           console.log(data.toString());
@@ -116,11 +139,11 @@ io.on("connection", (socket) => {
     }
 
     if (dilGlobal === "Python") {
-      dilSecimi("deneme.py", "py");
+      dilSecimi("deneme.py", seciliKomutOS.python);
     } else if (dilGlobal === "Java") {
-      dilSecimi("java.java", "java");
+      dilSecimi("java.java", seciliKomutOS.java);
     } else if (dilGlobal === "Php") {
-      dilSecimi("php.php", "php");
+      dilSecimi("php.php", seciliKomutOS.php);
     } else if (dilGlobal === "Html") {
       console.log("html secildi");
     } else if (dilGlobal === "Cdil") {
@@ -129,8 +152,7 @@ io.on("connection", (socket) => {
         else console.log("dosya olusturuldu");
         if (fs.existsSync("./c.exe")) {
           fs.unlinkSync("./c.exe");}
-
-          var cp =  spawn(process.env.comspec, ["/c", "gcc -o c","C.c"])
+          var cp =  spawn(seciliKomutOS.terminal, [seciliKomutOS.terminal_param, seciliKomutOS.c])
           cp.stdout.on("data", function (data) {
             console.log(data);
             console.log(data.toString());
@@ -149,7 +171,7 @@ io.on("connection", (socket) => {
               });
        
         setTimeout(function () {if (fs.existsSync("./c.exe")) {
-          var cp = spawn(process.env.comspec, ["/c", "","c.exe"]);
+          var cp = spawn(seciliKomutOS.terminal, [seciliKomutOS.terminal_param, (seciliKomutOS.os_isim == "windows" ? "c.exe" : "./c.exe")]);
           cp.stdout.on("data", function (data) {
             console.log(data);
             console.log(data.toString());
@@ -177,7 +199,7 @@ io.on("connection", (socket) => {
         if (fs.existsSync("./a.exe")) {
         fs.unlinkSync("./a.exe");}
 
-        var cp = spawn(process.env.comspec, ["/c", "g++", "Cpp.cpp"])
+        var cp = spawn(seciliKomutOS.terminal, [seciliKomutOS.terminal_param, seciliKomutOS.cpp])
         cp.stdout.on("data", function (data) {
           console.log(data);
           console.log(data.toString());
@@ -197,7 +219,7 @@ io.on("connection", (socket) => {
      
         
           setTimeout(function () {if (fs.existsSync("./a.exe")) {
-            var cp = spawn(process.env.comspec, ["/c", "", "a.exe"]);
+            var cp = spawn(seciliKomutOS.terminal, [seciliKomutOS.terminal_param, (seciliKomutOS.os_isim == "windows" ? "a.exe" : "./a.exe")]);
           
             cp.stdout.on("data", function (data) {
               console.log(data);
@@ -333,38 +355,100 @@ app.post("/login", async (req, res) => {
 
 app.get('/odayaGir', async (req, res )=> {
   if (!req.session.user) {
-    return res.status(301).send({cikis: "/giris.html"});
+    return res.status(301).send("session olusmadı");
   }
   
   console.log(req.session.user);
     //let toReturn = {...req.session.user};
-    return res.send(JSON.stringify({success: true,
+    return res.send(JSON.stringify({kullaniciAdi: req.session.user.username,
       message: req.session.user}));
 });
 
 app.post('/kodKayit', async (req, res) => {
-  
+  let baslik = req.body.baslik;
   let kod = req.body.kod;
+  let data = JSON.stringify({kod: kod,baslik: baslik});
   let email = req.session.user.email;
   let user = await User.findOne({ email: email});
+  let kodlar = user.kodlar[dilGlobal];
   if(user){
-    user.kodlar[dilGlobal].push(kod);
-    user.save();
-    return res.send(JSON.stringify({
-      success: true,
-      message: "Kodunuz Başarıyla kayıt edildi !",
-    }));
-  }
+    for(let i = 0; i <kodlar.length; i++){
+      let jsonOb = JSON.parse(kodlar[i]);
+      if(jsonOb.baslik == baslik){
+        return res.send(JSON.stringify({
+          success: false,
+          message: "Ayni baslik daha önce kullanilmiştir !"
+        }))
+      }}
+
+    user.kodlar[dilGlobal].push(data);
+      user.save();
+      return res.send(JSON.stringify({
+        success: true,
+        message: "Kodunuz Başarıyla kayıt edildi !",
+      }));
+    
+  
+}
 });
 
 
 app.post('/kodGetir', async (req, res) => {
 
 let email = req.session.user.email;
+console.log(email);
 let user = await User.findOne({ email: email});
+let kodlar = user.kodlar[dilGlobal];
 if(user){
- return res.send(JSON.stringify({kod:user.kodlar[dilGlobal]}))
+ return res.send(kodlar);
 }
 
 });
 
+app.post('/kodEkranaBas', async (req, res) => {
+  let baslik = req.body.baslik;
+  let user = await User.findOne({ email: req.session.user.email});
+  let kodlar = user.kodlar[dilGlobal];
+  if(user){
+ 
+    for(let i = 0; i <kodlar.length; i++){
+      let jsonOb = JSON.parse(kodlar[i]);
+      if(jsonOb.baslik == baslik){
+       return res.send((JSON.stringify(jsonOb.kod)))
+        //console.log(JSON.stringify({kod:JSON.parse(kodlar[i]).kod}));
+      }
+    } 
+}
+});
+
+app.post('/kodSilme', async (req, res) =>{
+  let baslik  = req.body.baslik;
+  let email = req.session.user.email;
+  let user = await User.findOne({email: email});
+  let kullanici = user.kodlar[dilGlobal]
+  if(user){
+    
+    for(let i = 0; i < kullanici.length; i++){
+      let jsonobjesi = JSON.parse(kullanici[i])
+      
+        
+      if(jsonobjesi.baslik === baslik){
+        kullanici.splice(i,1);
+        user.save();
+        return res.send(JSON.stringify({success:true, message:"Kodunuz Başarıyla Silinmiştir"}))
+        
+      }
+    }
+  }
+});
+
+app.post('/cikisYapp', async (req, res) =>{
+  req.session.destroy(err => {
+    if (err) {
+        console.log("hatali");
+    }
+    res.clearCookie('connect.sid');
+    console.log('calisti')
+    return res.send(JSON.stringify({yonlendir: "/"}));
+});
+});

@@ -35,14 +35,14 @@
   <body>
     <div class="container-fluid mt-3" id="container">
       <div class="navbar d-flex justify-content-between">
-        <div class="d-flex justify-content-around" style="width: 20%">
-          <i style="font-size: 30px" class="fas fa-home"></i>
+        <div class="d-flex justify-content-around" style="width: 40%">
+         <a href="/odaKur.html"><i style="font-size: 30px" class="fas fa-home"></i></a> 
 
           <p style="display: none" id="oda-id"></p>
           <button id="kopyala-btn" onclick="kopyala()" class="btn btn-primary">
             Id Kopyala
           </button>
-          <button id="kayit-et" onclick="kodKayitEt()">Kod Kaydet</button>
+          <button class="btn btn-info" id="kayit-et" onclick="kodKayitEt()">Kod Kaydet</button>
           
 
           <div>
@@ -62,7 +62,7 @@
             </select>
           </div>
           
-          <button
+          <button style="width: 8%;"
             id="btn"
             type="button"
             class="btn btn-dark"
@@ -72,29 +72,57 @@
           </button>
           
         </div>
-        <div class="d-flex justify-content-around">
-          <h4 id="KullaniciBilgi" style="color: white;"></h4>
+        
+        <div class="d-flex justify-content-between" style="width: 10%">
+          <h4 style="color:white;" id="kullanici-adi"></h4>
         </div>
 
-
-        <div class="d-flex justify-content-between" style="width: 20%">
-          <button id="kodGetir" onclick="kodGetirr()">Kod Getir</button>
+        <div class="d-flex justify-content-between" style="width: 25%">
+          <h4 style="color:white;" id="kullanici-adi"></h4>
+          <button class="btn btn-primary" id="kodGetir" onclick="kodGetirr()">Kod Getir</button>
           <input id="Input-al" type="text" onkeypress="degerAlma(event, this)" /> 
           
           <button id="Input-al-btn" class="btn btn-dark btn-xs">
             Input <i class="fa fa-pencil"></i>
           </button>
           
+          <button onclick="cikisYapp()" class="btn btn-primary" id="cikisYap"> <i class="fa-solid fa-right-from-bracket">  </i>   Cikis</button>
         </div>
       </div>
-     
+      
+
+      <div>
+        <input id="inp-baslik"  placeholder="Bir Baslik Giriniz" style="position: relative; margin-left: 15%; width: 30rem; margin-top: 1%;" type="text">
+        <div style="margin-left: 65%; display: none; margin-top: -1.5%;" id="kodGosterDiv">
+          <select  onchange="koduBas()" style="height: 2rem; width: 30rem;" name="Kodlar" id="kodGoster">
+            
+
+          </select>
+
+          <button class="btn btn-danger" onclick="kodSilmeF()" id="kodSil">Sil</button>
+        </div>
+      </div>
+       
+    
+
+      <!-- <div style="z-index: 15; width: 600px;
+      
+      width: 30%;
+      background-color: skyblue;
+      position: absolute;
+      display: none;
+      margin-top:1%; margin-left: 15%;" id="kodGosterDiv">
+        <ul id="kodGoster">
+          
+        </ul>
+     </div> -->
       <div class="row mt-3">
         <div id="editor" class="col-6">
           <p>
             <textarea
               style="
                 width: 1.5%;
-                height: 88vh;
+                height: 86vh;
                 padding-top: 9px;
                 background-color: rgb(0, 0, 0);
                 color: white;
@@ -109,10 +137,10 @@
             <div style="margin-top: -25px; margin-left: 2%; position: relative;">
               <textarea
               placeholder="Bir Programlama Dili Seciniz" id="editing" spellcheck="false" oninput="update(this.value); sync_scroll(this);" onscroll="sync_scroll(this);" onkeydown="check_tab(this, event);"
-              disabled  style="width: 98%; height: 88vh;"
+              disabled  style="width: 98%; height: 86vh;"
                 
               ></textarea>
-              <pre style="width: 98%; height: 88vh" id="highlighting" aria-hidden="true">
+              <pre style="width: 98%; height: 86vh" id="highlighting" aria-hidden="true">
                 <code class="language-html" id="highlighting-content">
         
                 </code>
@@ -122,10 +150,10 @@
         </div>
 
         <div style="height: 89.8vh;" class="col-6">
-          <textarea style="width: 100%; height: 88vh; color: black;" id="cikti" disabled></textarea>
+          <textarea style="width: 100%; height: 86vh; background-color: rgb(255, 255, 255);" id="cikti" disabled></textarea>
           <iframe
             style="background-color: white; display: none"
-            height="98%;"
+            height="95.6%;"
             width="100%"
             id="iframe-Cikti"
             src=""
@@ -135,13 +163,15 @@
       </div>
     </div>
 
+ 
+
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
       integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
-    <script src="/script.js"></script>
+    <script src="/script.js" defer></script>
     <script src="/prism.js"></script>
   </body>
 </html>
